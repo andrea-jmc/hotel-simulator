@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Simulator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            min-height: 100vh;
+            color: #423d3d;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            background: #f8f9fa;
+            color: #000;
+        }
+        .form-section {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Hotel Simulator</h1>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h3>Check-In Form</h3>
+            <form id="checkInForm">
+                <div class="mb-3">
+                    <label for="guestName" class="form-label">Guest Name</label>
+                    <input type="text" id="guestName" class="form-control" placeholder="Enter guest name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="assignedRoom" class="form-label">Room Number</label>
+                    <input type="number" id="assignedRoom" class="form-control" placeholder="Enter room number" required>
+                </div>
+                <div class="mb-3">
+                    <label for="stayDuration" class="form-label">Stay Duration (Days)</label>
+                    <input type="number" id="stayDuration" class="form-control" placeholder="Enter number of days" required>
+                </div>
+                <div id="errorMessage" class="text-danger" style="display: none;">Room number is already occupied. Please choose a different room.</div>
+                <button type="submit" class="btn btn-primary">Check In</button>
+            </form>
+        </div>
+
+        <!-- Map/Inventory Section -->
+        <h3 class="mt-5">Guest List</h3>
+        <div id="guestList" class="row g-4"></div>
+    </div>
+
+    <script>
+        // Guest constructor function
+        function Guest(name, room, duration) {
+            this.name = name;
+            this.room = room;
+            this.duration = duration;
+        }
+
+        // Preexisting guests
+        const guests = [
+            new Guest('John Doe', 101, 3),
+            new Guest('Jane Smith', 102, 5),
+        ];
+
+        // Function to render guests
+        function renderGuests() {
+            const guestList = document.getElementById('guestList');
+            guestList.innerHTML = '';
+
+            guests.forEach((guest) => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4';
+
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${guest.name}</h5>
+                            <p class="card-text">Room: ${guest.room}</p>
+                            <p class="card-text">Stay: ${guest.duration} days</p>
+                        </div>
+                    </div>
+                `;
+
+                guestList.appendChild(card);
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('checkInForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById('guestName').value;
+            const room = document.getElementById('assignedRoom').value;
+            const duration = document.getElementById('stayDuration').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Check if room is already occupied
+            const isRoomOccupied = guests.some(guest => guest.room === parseInt(room));
+
+            if (isRoomOccupied) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+            guests.push(new Guest(name, parseInt(room), parseInt(duration)));
+
+            renderGuests();
+
+            // Clear form
+            event.target.reset();
+        });
+
+        // Initial rendering of preexisting guests
+        renderGuests();
+    </script>
+</body>
+</html>
